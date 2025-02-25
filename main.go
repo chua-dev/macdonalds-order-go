@@ -143,9 +143,9 @@ func main() {
 
 	for {
 		var input string
-		promtpMessage := fmt.Sprintf("\n  Enter command:\n"+"> 1. %s \n"+"> 2. %s \n"+"> 3. %s \n"+"> 4. %s \n"+"> 5. exit \n",
+		promptMessage := fmt.Sprintf("\n  Enter command:\n"+"> 1. %s \n"+"> 2. %s \n"+"> 3. %s \n"+"> 4. %s \n"+"> 5. exit \n",
 			constant.NewNormalOrder, constant.NewVipOrder, constant.AddBot, constant.RemoveBot)
-		fmt.Println(promtpMessage)
+		fmt.Println(promptMessage)
 		fmt.Scanln(&input)
 
 		switch input {
