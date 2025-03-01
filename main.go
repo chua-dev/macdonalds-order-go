@@ -23,7 +23,7 @@ func main() {
 		case string(constant.NewVipOrderId):
 			kitchen.AddOrder(true)
 		case string(constant.AddBotId):
-			kitchen.AddBot()
+			kitchen.AddBot(true)
 		case string(constant.RemoveBotId):
 			kitchen.RemoveBot()
 		case string(constant.ExitId):

@@ -26,32 +26,30 @@ func NewKitchen() *Kitchen {
 func (k *Kitchen) AddOrder(vip bool) {
 	k.mu.Lock()
 	defer k.mu.Unlock()
-	order := &Order{ID: k.orderID + 1, VIP: vip, ProcessingTime: constant.DefaultProcessingTime}
+	order := &Order{ID: k.orderID + 1, VIP: vip, ProcessingTime: constant.DefaultBotProcessingTime}
 	k.orderID++
 
-	if vip {
-		index := 0
-		for i, o := range k.pendingOrders {
-			if !o.VIP {
-				index = i
-				break
-			}
-		}
-		k.pendingOrders = append(k.pendingOrders[:index], append([]*Order{order}, k.pendingOrders[index:]...)...)
-	} else {
-		k.pendingOrders = append(k.pendingOrders, order)
-	}
+	k.pendingOrders = append(k.pendingOrders, order)
+	sortOrders(k.pendingOrders)
 
 	fmt.Printf("New Order ID %d (VIP: %v) added to PENDING AREA \n\n", order.ID, order.VIP)
 	if len(k.bots) > 0 {
-		k.NewOrder <- true
+		go func() {
+			k.NewOrder <- true
+		}()
 	}
 	k.ShowOrders()
+
 }
 
-func (k *Kitchen) AddBot() {
+func (k *Kitchen) AddBot(faster bool) {
 	k.mu.Lock()
-	bot := &Bot{ID: k.botID + 1, Idle: make(chan bool, 1), Stop: make(chan bool, 1)}
+
+	speed := constant.DefaultBotProcessingTime
+	if faster {
+		speed = constant.FasterBotProcessingTime
+	}
+	bot := &Bot{ID: k.botID + 1, Idle: make(chan bool, 1), Stop: make(chan bool, 1), ProcessingSpeed: speed}
 	k.botID++
 	k.bots = append(k.bots, bot)
 	k.mu.Unlock()
@@ -81,7 +79,7 @@ func (k *Kitchen) AddBot() {
 					sortOrders(k.pendingOrders)
 					k.ShowOrders()
 					continue
-				case <-time.After(time.Duration(frontOrder.ProcessingTime) * time.Second):
+				case <-time.After(time.Duration(bot.ProcessingSpeed) * time.Second):
 				}
 				fmt.Printf("Order #%d completed\n", frontOrder.ID)
 				k.completedOrders = append(k.completedOrders, frontOrder)
@@ -125,3 +123,19 @@ func sortOrders(orders []*Order) {
 		return orders[i].ID < orders[j].ID
 	})
 }
+
+/*
+func sortOrdersLogicWithVipBool(orders []*Order, order *Order, vip bool) {
+	if vip {
+		index := 0
+		for i, o := range orders {
+			if !o.VIP {
+				index = i
+				break
+			}
+		}
+		orders = append(orders[:index], append([]*Order{order}, orders[index:]...)...)
+	} else {
+		orders = append(orders, order)
+	}
+}*/

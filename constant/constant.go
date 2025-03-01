@@ -21,5 +21,6 @@ const (
 )
 
 const (
-	DefaultProcessingTime = 10
+	DefaultBotProcessingTime = 10
+	FasterBotProcessingTime  = 5
 )

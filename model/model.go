@@ -7,7 +7,9 @@ type Order struct {
 }
 
 type Bot struct {
-	ID   int
-	Idle chan bool
-	Stop chan bool
+	ID              int
+	FasterBot       bool
+	ProcessingSpeed int
+	Idle            chan bool
+	Stop            chan bool
 }
